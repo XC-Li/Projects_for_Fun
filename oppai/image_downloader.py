@@ -56,7 +56,9 @@ def get_actress_from_menu(page_id: int) -> Dict[str, str]:
 def get_image_list(link: str) -> List[str]:
     soup = link_to_soup(link)
     image_list = []
-    for image_container in soup.find_all('dt', class_='gallery-icon portrait'):
+    # for image_container in soup.find_all('dt', class_='gallery-icon portrait'):  # not need portrait
+    #     image_list.append(image_container.a.attrs['href'])
+    for image_container in soup.find_all('dt', class_='gallery-icon landscape'):
         image_list.append(image_container.a.attrs['href'])
     return image_list
         
@@ -64,9 +66,10 @@ def get_image_list(link: str) -> List[str]:
 def save_image(link: str, folder: str):
     file_name = link.split('/')[-1]
     myfile = requests.get(link)
-    out_file = image_root + folder + '/' + file_name
-    if not os.path.exists(image_root + folder):
-        os.mkdir(image_root + folder)
+    if not os.path.exists(image_root + '/@oppai/'):
+        os.mkdir(image_root + '/@oppai/')
+    out_file = image_root + folder + '_' + file_name  # all saved into one folder
+
     image_content = myfile.content
     open(out_file, 'wb').write(image_content)
     key = record_label(out_file)
@@ -140,10 +143,18 @@ def main(page_start, page_end=None):
                 continue  # already downloaded
             else:
                 image_list = get_image_list(actress_dict[actress])
+                if len(image_list) == 0:
+                    print('No landscape image, continue now!')
+                    continue
                 for image_link in image_list:  # download all image
                     temp_result.append(image_link + ',' + save_image(image_link, actress))
 
-                with open(label_file, 'a+') as label:
+                cv.destroyAllWindows()
+                confirm = input("Confirm Continue?(y/any other)")  # confirm after each download folder completed
+                if confirm != 'y':
+                    print('exit now!')
+                    exit()
+                with open(label_file, 'a+') as label:  # write into label file and record
                     for line in temp_result:
                         label.write(line)
                 with open(download_completed_record, 'a+') as record_file:  # after download completed
