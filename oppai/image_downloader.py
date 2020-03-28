@@ -23,13 +23,14 @@ def link_to_soup(url: str) -> BeautifulSoup:
        'Accept-Encoding': 'none',
        'Accept-Language': 'en-US,en;q=0.8',
        'Connection': 'keep-alive'}
-    request = urllib.request.Request(url, headers=head)
-    response = urllib.request.urlopen(request)
-    if response.status != 200:
-        print('error opening :', url)
-        raise ValueError
-    soup = BeautifulSoup(response.read().decode('utf-8'), 'lxml')
-    return soup
+    while True:
+        try:
+            request = urllib.request.Request(url, headers=head)
+            response = urllib.request.urlopen(request)
+            soup = BeautifulSoup(response.read().decode('utf-8'), 'lxml')
+            return soup
+        except UnicodeDecodeError:
+            continue
 
 
 def get_actress_from_menu(page_id: int) -> Dict[str, str]:
@@ -66,8 +67,13 @@ def save_image(link: str, folder: str):
     out_file = image_root + folder + '/' + file_name
     if not os.path.exists(image_root + folder):
         os.mkdir(image_root + folder)
-    open(out_file, 'wb').write(myfile.content)
+    image_content = myfile.content
+    open(out_file, 'wb').write(image_content)
     key = record_label(out_file)
+    if key == '+':  #oppai image
+        oppai_file = image_root + '/@oppai/' + folder + "_" + file_name
+        open(oppai_file, 'wb').write(image_content)
+
     return out_file + ',' + key + '\n'
 
 
@@ -79,20 +85,36 @@ def record_label(image_file):
     cv.namedWindow('image', cv.WINDOW_NORMAL)
     cv.resizeWindow('image', image.shape[1]//2, image.shape[0]//2)
     cv.imshow('image', image)
-    key_naked = key_posture = key_parts = key_4 = '/'
-    while key_naked == '/' or key_posture == '/' or key_parts == '/' or key_4 == '/':  # if there is a mistake
-        print(image_file, end=':')
-        key_naked = chr(cv.waitKey(0))
-        print(key_naked, end='')
-        key_posture = chr(cv.waitKey(0))
-        print(key_posture, end='')
-        key_parts = chr(cv.waitKey(0))
-        print(key_parts, end='\n')
-        key_4 = chr(cv.waitKey(0))
-    cv.destroyAllWindows()
-    key = key_naked + key_posture + key_parts
-    if key == '|||':
-        exit()
+    """A more complicated labeling method"""
+    # key_naked = key_posture = key_parts = key_4 = '/'
+    # while key_naked == '/' or key_posture == '/' or key_parts == '/' or key_4 == '/':  # if there is a mistake
+    #     print(image_file, end=':')
+    #     key_naked = chr(cv.waitKey(0))
+    #     print(key_naked, end='')
+    #     key_posture = chr(cv.waitKey(0))
+    #     print(key_posture, end='')
+    #     key_parts = chr(cv.waitKey(0))
+    #     print(key_parts, end='\n')
+    #     key_4 = chr(cv.waitKey(0))
+    # key = key_naked + key_posture + key_parts
+    # if key == '|||':
+    #     exit()
+    """A simple labeling method only filter oppai"""
+    key = '/'
+    key = cv.waitKey(1000)
+    if key == -1:
+        key = '-'
+    else:
+        if chr(key) == 'q':  # quit
+            exit()
+        elif chr(key) == 'a':  # good
+            key = 'a'
+            print('good photo!')
+        else:
+            key = '+'
+            print('oppai saved')
+    # cv.destroyAllWindows()
+
     # print(key)
     return key
 
@@ -132,4 +154,5 @@ if __name__ == '__main__':
     # print(get_actress_from_menu(1))
     # save_image('https://www.jav.ink/wp-content/uploads/2020/02/10/gra_uta-y_sp121.jpg', 'Uta_Yumemite_夢見照うた')
     # record_label("D:/PPic/GraphisDataSet/Uta_Yumemite_夢見照うた/gra_uta-y_sp121.jpg")
-    main(1)
+    page_id = input('which page:')
+    main(int(page_id))
