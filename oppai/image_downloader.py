@@ -151,6 +151,8 @@ def main(page_start, page_end=None):
 
                 cv.destroyAllWindows()
                 confirm = input("Confirm Continue?(y/any other)")  # confirm after each download folder completed
+                if confirm == 'skip':  # skip the folder which will cause problem
+                    continue
                 if confirm != 'y':
                     print('exit now!')
                     exit()
