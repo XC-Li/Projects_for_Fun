@@ -1,4 +1,8 @@
-"""image downloader"""
+"""
+Image Downloader
+Downloads image from website and label them manually during saving
+By: Xiaochi(George)Li/Mar.2020
+"""
 from typing import Dict, List
 import urllib.request
 from bs4 import BeautifulSoup
@@ -164,8 +168,5 @@ def main(page_start, page_end=None):
 
 
 if __name__ == '__main__':
-    # print(get_actress_from_menu(1))
-    # save_image('https://www.jav.ink/wp-content/uploads/2020/02/10/gra_uta-y_sp121.jpg', 'Uta_Yumemite_夢見照うた')
-    # record_label("D:/PPic/GraphisDataSet/Uta_Yumemite_夢見照うた/gra_uta-y_sp121.jpg")
-    page_id = input('which page:')
+    page_id = input('which page:')  # simple use
     main(int(page_id))
