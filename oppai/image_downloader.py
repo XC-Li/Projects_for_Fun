@@ -114,9 +114,9 @@ def record_label(image_file):
     else:
         if chr(key) == 'q':  # quit
             exit()
-        elif chr(key) == 'a':  # good
-            key = 'a'
-            print('good photo!')
+        # elif chr(key) == 'a':  # good
+        #     key = 'a'
+        #     print('good photo!')
         else:
             key = '+'
             print('oppai saved')
@@ -165,8 +165,17 @@ def main(page_start, page_end=None):
                         label.write(line)
                 with open(download_completed_record, 'a+') as record_file:  # after download completed
                     record_file.write(actress + '\n')
+    return "completed"
 
 
 if __name__ == '__main__':
-    page_id = input('which page:')  # simple use
-    main(int(page_id))
+    page_id = int(open('record.temp', 'r').read())
+    print(page_id)
+    # page_id = input('which page:')  # simple use
+    result = main(page_id)
+    if result == 'completed':
+        print('This page has been completed!')
+        with open('record.temp', 'w') as page_record:
+            page_record.write(str(page_id + 1))
+    else:
+        print('This page has not been completed')
