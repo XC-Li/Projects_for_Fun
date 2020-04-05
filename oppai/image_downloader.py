@@ -139,9 +139,11 @@ def main(page_start, page_end=None):
     for page_id in range(page_start, page_end):
         print('page:', page_id)
         actress_dict = get_actress_from_menu(page_id)
+        actress_count = 0
         for actress in actress_dict:
+            actress_count += 1
             temp_result = []
-            print('actress:', actress)
+            print('Actress No.', str(actress_count), ':', actress)
             if actress in records:
                 print('actress:', actress, 'already downloaded')
                 continue  # already downloaded
@@ -154,7 +156,7 @@ def main(page_start, page_end=None):
                     temp_result.append(image_link + ',' + save_image(image_link, actress))
 
                 cv.destroyAllWindows()
-                confirm = input("Confirm Continue?(y/any other)")  # confirm after each download folder completed
+                confirm = input("Confirm Continue?(y/any other):")  # confirm after each download folder completed
                 if confirm == 'skip':  # skip the folder which will cause problem
                     continue
                 if confirm != 'y':
